@@ -1,10 +1,3 @@
-var mqtt, control_topic, str_message;
-
-// Describe this function...
-function setTimeout2() {
-}
-
-
 /**
 * Created by Il Yeup, Ahn in KETI on 2019-11-30.
 */
