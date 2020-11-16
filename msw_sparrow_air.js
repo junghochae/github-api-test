@@ -136,6 +136,91 @@ catch (e) {
   };
   config.lib.push(add_lib);
 }
+function init() {
+  if(config.lib.length > 0) {
+    for(var idx in config.lib) {
+      if(config.lib.hasOwnProperty(idx)) {
+        if (msw_mqtt_client != null) {
+          for (var i = 0; i < config.lib[idx].control.length; i++) {
+            var sub_container_name = config.lib[idx].control[i];
+            _topic = '/Mobius/' + config.gcs + '/Mission_Data/' + config.drone + '/' + my_msw_name + '/' + sub_container_name;
+            msw_mqtt_client.subscribe(_topic);
+            msw_sub_muv_topic.push(_topic);
+            console.log('[msw_mqtt] msw_sub_muv_topic[' + i + ']: ' + _topic);
+          }
+
+          for (var i = 0; i < config.lib[idx].data.length; i++) {
+            var container_name = config.lib[idx].data[i];
+            var _topic = '/MUV/data/' + config.lib[idx].name + '/' + container_name;
+            msw_mqtt_client.subscribe(_topic);
+            msw_sub_lib_topic.push(_topic);
+            console.log('[lib_mqtt] lib_topic[' + i + ']: ' + _topic);
+          }
+        }
+
+        var obj_lib = config.lib[idx];
+        setTimeout(runLib, 1000 + parseInt(Math.random()*10), JSON.parse(JSON.stringify(obj_lib)));
+      }
+    }
+  }
+}
+
+function runLib(obj_lib) {
+  try {
+    var scripts_arr = obj_lib.scripts.split(' ');
+    if(config.directory_name == '') {
+
+    }
+    else {
+      scripts_arr[0] = scripts_arr[0].replace('./', '');
+      scripts_arr[0] = './' + config.directory_name + '/' + scripts_arr[0];
+    }
+
+    var run_lib = spawn(scripts_arr[0], scripts_arr.slice(1));
+
+    run_lib.stdout.on('data', function(data) {
+      console.log('stdout: ' + data);
+    });
+
+    run_lib.stderr.on('data', function(data) {
+      console.log('stderr: ' + data);
+    });
+
+    run_lib.on('exit', function(code) {
+      console.log('exit: ' + code);
+    });
+
+    run_lib.on('error', function(code) {
+      console.log('error: ' + code);
+    });
+  }
+  catch (e) {
+    console.log(e.message);
+  }
+}
+
+function on_receive_from_muv(topic, str_message) {
+  console.log('[' + topic + '] ' + str_message);
+
+  parseControlMission(topic, str_message);
+}
+
+function on_receive_from_lib(topic, str_message) {
+  console.log('[' + topic + '] ' + str_message + '
+');
+
+  parseDataMission(topic, str_message);
+}
+
+function on_process_fc_data(topic, str_message) {
+  var topic_arr = topic.split('/');
+  fc[topic_arr[topic_arr.length-1]] = JSON.parse(str_message.toString());
+
+  parseFcData(topic, str_message);
+}
+
+setTimeout(init, 1000);
+
 // msw가 muv로 부터 트리거를 받는 용도
 // 명세에 sub_container 로 표기
 var msw_sub_muv_topic = [];
