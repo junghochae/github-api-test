@@ -309,7 +309,7 @@ function msw_mqtt_connect(broker_ip, port) {
 //////////////////////////////////////////////////////////////////////////////
 function parseDataMission(topic, str_message) {
   try {
-        // User define Code         var obj_lib_data = JSON.parse(str_message);         if(fc.hasOwnProperty('global_position_int')) {             Object.assign(obj_lib_data, JSON.parse(JSON.stringify(fc['global_position_int'])));         }         str_message = JSON.stringify(obj_lib_data);          ///////////////////////////////////////////////////////////////////////          var topic_arr = topic.split('/');         var data_topic = '/Mobius/' + config.gcs + '/Mission_Data/' + config.drone + '/' + config.name + '/' + topic_arr[topic_arr.length-1];         msw_mqtt_client.publish(data_topic + '/' + my_sortie_name, str_message); //         msw_mqtt_client.publish(data_topic, str_message);  }
+        // User define Code\n         var obj_lib_data = JSON.parse(str_message);         if(fc.hasOwnProperty('global_position_int')) {             Object.assign(obj_lib_data, JSON.parse(JSON.stringify(fc['global_position_int'])));         }         str_message = JSON.stringify(obj_lib_data);          ///////////////////////////////////////////////////////////////////////          var topic_arr = topic.split('/');         var data_topic = '/Mobius/' + config.gcs + '/Mission_Data/' + config.drone + '/' + config.name + '/' + topic_arr[topic_arr.length-1];         msw_mqtt_client.publish(data_topic + '/' + my_sortie_name, str_message); //         msw_mqtt_client.publish(data_topic, str_message);  }
   catch (e) {
     console.log('[parseDataMission] data format of lib is not json');
   }
